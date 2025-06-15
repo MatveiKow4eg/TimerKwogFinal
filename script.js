@@ -32,13 +32,19 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const saved = localStorage.getItem("userNumber");
-    if (saved) {
+// Гарантированный запуск autoStart даже если DOM уже загружен
+const saved = localStorage.getItem("userNumber");
+if (saved) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
       showUI(saved);
       autoStart(saved);
-    }
-  });
+    });
+  } else {
+    showUI(saved);
+    autoStart(saved);
+  }
+}
 
 startBtn.onclick = () => {
   const num = userInput.value.trim();
