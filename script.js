@@ -149,9 +149,12 @@ if (document.getElementById("usersTable")) {
   const pauseAllBtn = document.getElementById("pauseAllBtn");
   let allPaused = false;
 
+  const localTimers = {}; // ⬅️ Сюда будем сохранять локальные копии
+
   db.ref("timers").on("value", snap => {
     const data = snap.val() || {};
     usersTable.innerHTML = "";
+    Object.keys(localTimers).forEach(key => delete localTimers[key]); // очистить старое
 
     for (const user in data) {
       const timeLeft = data[user].timeLeft;
@@ -168,7 +171,7 @@ if (document.getElementById("usersTable")) {
       card.innerHTML = `
         <div class="info">
           <div>${indicator}<strong>Участник ${user}</strong></div>
-          <div>Осталось: ${formatTime(timeLeft)}</div>
+          <div class="time-display">Осталось: ${formatTime(timeLeft)}</div>
         </div>
         <div class="actions">
           <button class="delete" data-user="${user}">❌</button>
@@ -180,8 +183,16 @@ if (document.getElementById("usersTable")) {
         </div>
       `;
       usersTable.appendChild(card);
+
+      // ⬇️ Сохраняем ссылку на текст и данные для визуального обновления
+      localTimers[user] = {
+        timeLeft: timeLeft,
+        isPaused: isPaused,
+        element: card.querySelector(".time-display")
+      };
     }
 
+    // Все обработчики кнопок — без изменений:
     document.querySelectorAll(".delete").forEach(btn => {
       btn.onclick = () => {
         const user = btn.dataset.user;
@@ -246,6 +257,17 @@ if (document.getElementById("usersTable")) {
       };
     });
   });
+
+  // ✅ Глобальный визуальный апдейтер
+  setInterval(() => {
+    for (const user in localTimers) {
+      const t = localTimers[user];
+      if (!t.isPaused && t.timeLeft > 0) {
+        t.timeLeft--;
+        t.element.textContent = `Осталось: ${formatTime(t.timeLeft)}`;
+      }
+    }
+  }, 1000);
 
   pauseAllBtn.onclick = () => {
     allPaused = !allPaused;
