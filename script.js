@@ -33,9 +33,16 @@ if (document.getElementById("startBtn")) {
   let timeExpiredNotified = false;
 
   document.addEventListener("DOMContentLoaded", () => {
-    const saved = localStorage.getItem("userNumber");
-    if (saved) autoStart(saved);
-  });
+  const saved = localStorage.getItem("userNumber");
+  if (saved) {
+    userInput.style.display = "none";
+    startBtn.style.display = "none";
+    document.querySelector("h2").style.display = "none";
+    timerContainer.style.display = "block";
+    userIdDisplay.textContent = saved;
+    autoStart(saved);
+  }
+});
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
