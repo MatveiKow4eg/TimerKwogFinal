@@ -259,15 +259,19 @@ if (document.getElementById("usersTable")) {
   });
 
   // ✅ Глобальный визуальный апдейтер
-  setInterval(() => {
-    for (const user in localTimers) {
-      const t = localTimers[user];
-      if (!t.isPaused && t.timeLeft > 0) {
-        t.timeLeft--;
-        t.element.textContent = `Осталось: ${formatTime(t.timeLeft)}`;
-      }
+setInterval(() => {
+  for (const user in localTimers) {
+    const t = localTimers[user];
+    if (!t.isPaused) {
+      db.ref(`timers/${user}`).transaction(data => {
+        if (data && data.timeLeft > 0) {
+          data.timeLeft--;
+        }
+        return data;
+      });
     }
-  }, 1000);
+  }
+}, 1000);
 
   pauseAllBtn.onclick = () => {
     allPaused = !allPaused;
