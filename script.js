@@ -108,14 +108,23 @@ if (document.getElementById("startBtn")) {
       timerDisplay.textContent = formatTime(data.timeLeft);
       clearInterval(timerInterval);
 
-      if (!data.isPaused) {
-        timerInterval = setInterval(() => {
-          db.ref(`timers/${num}`).transaction(t => {
-            if (t && t.timeLeft > 0) t.timeLeft--;
-            return t;
-          });
-        }, 1000);
+     if (!data.isPaused) {
+  // просто визуальное обновление, без записи в базу
+  let remaining = data.timeLeft;
+  timerDisplay.textContent = formatTime(remaining);
+  timerInterval = setInterval(() => {
+    remaining--;
+    timerDisplay.textContent = formatTime(remaining);
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      if (!timeExpiredNotified) {
+        timeExpiredNotified = true;
+        alert("⏰ Время вышло!");
       }
+    }
+  }, 1000);
+}
+
 
       if (data.timeLeft === 0 && !timeExpiredNotified) {
         timeExpiredNotified = true;
