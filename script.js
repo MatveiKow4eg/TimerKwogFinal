@@ -40,26 +40,33 @@ if (document.getElementById("startBtn")) {
     }
   });
 
-  startBtn.onclick = () => {
-    const num = userInput.value.trim();
-    if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
-      alert("Введите номер от 1 до 60!");
+startBtn.onclick = () => {
+  const num = userInput.value.trim();
+  if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
+    alert("Введите номер от 1 до 60!");
+    return;
+  }
+
+  db.ref("timers").once("value").then(all => {
+    const timers = all.val() || {};
+    if (Object.keys(timers).length >= 60) {
+      alert("Уже 60 участников.");
+      return;
+    }
+    if (timers[num]) {
+      alert("Этот номер занят.");
       return;
     }
 
-    db.ref("timers").once("value").then(all => {
-      const timers = all.val() || {};
-      if (Object.keys(timers).length >= 60) return alert("Уже 60 участников.");
-      if (timers[num]) return alert("Этот номер занят.");
+    currentNumber = num;
 
-      currentNumber = num;
+    // 🔄 Новый вариант — безопасный старт с перезагрузкой
+    db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true }).then(() => {
       localStorage.setItem("userNumber", num);
-      db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true });
-
-      showUI(num);
-      listenTimer(num);
+      location.reload(); // вызовет autoStart после загрузки
     });
-  };
+  });
+};
 
   function autoStart(num) {
     currentNumber = num;
