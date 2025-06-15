@@ -1,44 +1,139 @@
-<style>
-  .container {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-  }
-
-  .logo {
-    width: 120px;
-    margin-bottom: 40px;
-    box-shadow: 0 0 20px #7df9ff;
-    position: absolute;
-    top: 30px;
-  }
-
-  #userLabel {
-    font-size: 22px;
-    margin-top: 160px;
-    margin-bottom: 20px;
-    color: #00ffff;
-    text-shadow: 0 0 6px #00ffff;
-  }
-
-  #timer {
-    font-size: 18vw; /* responsive, huge on phones */
-    font-weight: bold;
-    background: linear-gradient(to right, #ffffff, #00f0ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 25px rgba(129, 255, 255, 0.4);
-  }
-
-  @media (min-width: 768px) {
-    #timer {
-      font-size: 120px;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>КОВЧЕГ — Таймер</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #000;
+      color: white;
+      overflow: hidden;
+      position: relative;
     }
-  }
-</style>
+
+    .background-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 20px #7df9ff;
+      position: absolute;
+      top: 30px;
+    }
+
+    h1, #inputBlock p, .subtitle, .title {
+      display: none;
+    }
+
+    #inputBlock {
+      margin-top: 180px;
+    }
+
+    #userLabel {
+      font-size: 22px;
+      margin-top: 160px;
+      margin-bottom: 20px;
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+    }
+
+    #timer {
+      font-size: 18vw;
+      font-weight: bold;
+      background: linear-gradient(to right, #ffffff, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(129, 255, 255, 0.4);
+    }
+
+    @media (min-width: 768px) {
+      #timer {
+        font-size: 120px;
+      }
+    }
+
+    input {
+      padding: 12px 18px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #232340;
+      color: #fff;
+      margin-bottom: 12px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 25px;
+      background: #00ffff;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #7df9ff;
+    }
+
+    #timerContainer {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="background-stars.png" class="background-image" alt="space background" />
+
+  <div class="container">
+    <object data="kovcheg-logo.svg" type="image/svg+xml" class="logo"></object>
+
+    <h1>КОВЧЕГ</h1>
+
+    <div id="inputBlock">
+      <p>Введи свой номер</p>
+      <input type="text" id="userNumber" placeholder="например: 17" />
+      <button id="startBtn">🚀 НАЧАТЬ ТАЙМЕР</button>
+    </div>
+
+    <div id="timerContainer">
+      <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
+      <div id="timer">10:00</div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
