@@ -33,16 +33,12 @@ if (document.getElementById("startBtn")) {
   let timeExpiredNotified = false;
 
   document.addEventListener("DOMContentLoaded", () => {
-  const saved = localStorage.getItem("userNumber");
-  if (saved) {
-    userInput.style.display = "none";
-    startBtn.style.display = "none";
-    document.querySelector("h2").style.display = "none";
-    timerContainer.style.display = "block";
-    userIdDisplay.textContent = saved;
-    autoStart(saved);
-  }
-});
+    const saved = localStorage.getItem("userNumber");
+    if (saved) {
+      showUI(saved);
+      autoStart(saved);
+    }
+  });
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
@@ -101,52 +97,36 @@ if (document.getElementById("startBtn")) {
   }
 
   function listenTimer(num) {
-  db.ref(`timers/${num}`).on("value", snap => {
-    const data = snap.val();
+    db.ref(`timers/${num}`).on("value", snap => {
+      const data = snap.val();
 
-    if (!data) {
-      alert("⛔ Твой таймер был удалён администратором.");
-      localStorage.removeItem("userNumber");
-      location.reload();
-      return;
-    }
+      if (!data) {
+        alert("⛔ Твой таймер был удалён администратором.");
+        localStorage.removeItem("userNumber");
+        location.reload();
+        return;
+      }
 
-    timerDisplay.textContent = formatTime(data.timeLeft);
-    clearInterval(timerInterval);
+      timerDisplay.textContent = formatTime(data.timeLeft);
+      clearInterval(timerInterval);
 
-function listenTimer(num) {
-  db.ref(`timers/${num}`).on("value", snap => {
-    const data = snap.val();
-
-    if (!data) {
-      alert("⛔ Твой таймер был удалён администратором.");
-      localStorage.removeItem("userNumber");
-      location.reload();
-      return;
-    }
-
-    timerDisplay.textContent = formatTime(data.timeLeft);
-    clearInterval(timerInterval);
-
-    if (!data.isPaused) {
-      let remaining = data.timeLeft;
-      timerDisplay.textContent = formatTime(remaining);
-      timerInterval = setInterval(() => {
-        remaining--;
+      if (!data.isPaused) {
+        let remaining = data.timeLeft;
         timerDisplay.textContent = formatTime(remaining);
-        if (remaining <= 0) {
-          clearInterval(timerInterval);
-          if (!timeExpiredNotified) {
-            timeExpiredNotified = true;
-            alert("⏰ Время вышло!");
+        timerInterval = setInterval(() => {
+          remaining--;
+          timerDisplay.textContent = formatTime(remaining);
+          if (remaining <= 0) {
+            clearInterval(timerInterval);
+            if (!timeExpiredNotified) {
+              timeExpiredNotified = true;
+              alert("⏰ Время вышло!");
+            }
           }
-        }
-      }, 1000);
-    }
-  });
-}
-
-
+        }, 1000);
+      }
+    });
+  }
 
   function showUI(num) {
     userInput.style.display = "none";
@@ -164,12 +144,12 @@ if (document.getElementById("usersTable")) {
   const pauseAllBtn = document.getElementById("pauseAllBtn");
   let allPaused = false;
 
-  const localTimers = {}; // ⬅️ Сюда будем сохранять локальные копии
+  const localTimers = {};
 
   db.ref("timers").on("value", snap => {
     const data = snap.val() || {};
     usersTable.innerHTML = "";
-    Object.keys(localTimers).forEach(key => delete localTimers[key]); // очистить старое
+    Object.keys(localTimers).forEach(key => delete localTimers[key]);
 
     for (const user in data) {
       const timeLeft = data[user].timeLeft;
@@ -199,7 +179,6 @@ if (document.getElementById("usersTable")) {
       `;
       usersTable.appendChild(card);
 
-      // ⬇️ Сохраняем ссылку на текст и данные для визуального обновления
       localTimers[user] = {
         timeLeft: timeLeft,
         isPaused: isPaused,
@@ -207,7 +186,6 @@ if (document.getElementById("usersTable")) {
       };
     }
 
-    // Все обработчики кнопок — без изменений:
     document.querySelectorAll(".delete").forEach(btn => {
       btn.onclick = () => {
         const user = btn.dataset.user;
@@ -273,20 +251,19 @@ if (document.getElementById("usersTable")) {
     });
   });
 
-  // ✅ Глобальный визуальный апдейтер
-setInterval(() => {
-  for (const user in localTimers) {
-    const t = localTimers[user];
-    if (!t.isPaused) {
-      db.ref(`timers/${user}`).transaction(data => {
-        if (data && data.timeLeft > 0) {
-          data.timeLeft--;
-        }
-        return data;
-      });
+  setInterval(() => {
+    for (const user in localTimers) {
+      const t = localTimers[user];
+      if (!t.isPaused) {
+        db.ref(`timers/${user}`).transaction(data => {
+          if (data && data.timeLeft > 0) {
+            data.timeLeft--;
+          }
+          return data;
+        });
+      }
     }
-  }
-}, 1000);
+  }, 1000);
 
   pauseAllBtn.onclick = () => {
     allPaused = !allPaused;
