@@ -38,15 +38,15 @@
       justify-content: center;
       height: 100vh;
       text-align: center;
-      padding: 20px;
     }
 
     .logo {
-      width: 120px;
-      margin-bottom: 40px;
-      box-shadow: 0 0 20px #7df9ff;
+      width: 100px;
       position: absolute;
       top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 20px #7df9ff;
     }
 
     h1, #inputBlock p, .subtitle, .title {
@@ -54,29 +54,29 @@
     }
 
     #inputBlock {
-      margin-top: 180px;
+      margin-top: 200px;
     }
 
     #userLabel {
-      font-size: 22px;
-      margin-top: 160px;
+      font-size: 24px;
       margin-bottom: 20px;
       color: #00ffff;
       text-shadow: 0 0 6px #00ffff;
     }
 
     #timer {
-      font-size: 18vw;
+      font-size: 24vw;
+      line-height: 1;
       font-weight: bold;
       background: linear-gradient(to right, #ffffff, #00f0ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 25px rgba(129, 255, 255, 0.4);
+      text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
     }
 
     @media (min-width: 768px) {
       #timer {
-        font-size: 120px;
+        font-size: 160px;
       }
     }
 
@@ -109,6 +109,11 @@
 
     #timerContainer {
       display: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
     }
   </style>
 </head>
