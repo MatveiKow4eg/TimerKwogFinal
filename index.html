@@ -47,10 +47,8 @@
       box-shadow: 0 0 20px #7df9ff;
     }
 
-    #timerContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    h1, #inputBlock p, .subtitle, .title {
+      display: none;
     }
 
     #userLabel {
@@ -68,11 +66,61 @@
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 20px rgba(129, 255, 255, 0.3);
     }
+
+    input {
+      padding: 12px 18px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #232340;
+      color: #fff;
+      margin-bottom: 12px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 25px;
+      background: #00ffff;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #7df9ff;
+    }
+
+    #timerContainer {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <img src="background-stars.png" class="background-image" alt="space background" />
+
   <div class="container">
     <object data="kovcheg-logo.svg" type="image/svg+xml" class="logo"></object>
-    <div id="timerContainer" style="display:none;">
-      <h2
+
+    <h1>КОВЧЕГ</h1> <!-- скрыт -->
+    
+    <div id="inputBlock">
+      <p>Введи свой номер</p> <!-- скрыто -->
+      <input type="text" id="userNumber" placeholder="например: 17" />
+      <button id="startBtn">🚀 НАЧАТЬ ТАЙМЕР</button>
+    </div>
+
+    <div id="timerContainer">
+      <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
+      <div id="timer">10:00</div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
