@@ -146,7 +146,7 @@ function listenTimer(num) {
   });
 }
 
-  }
+
 
   function showUI(num) {
     userInput.style.display = "none";
