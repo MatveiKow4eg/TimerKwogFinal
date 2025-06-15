@@ -101,30 +101,37 @@ if (document.getElementById("startBtn")) {
   }
 
   function listenTimer(num) {
-    db.ref(`timers/${num}`).on("value", snap => {
-      const data = snap.val();
-      if (!data) return;
+  db.ref(`timers/${num}`).on("value", snap => {
+    const data = snap.val();
 
-      timerDisplay.textContent = formatTime(data.timeLeft);
-      clearInterval(timerInterval);
-
-     if (!data.isPaused) {
-  // просто визуальное обновление, без записи в базу
-  let remaining = data.timeLeft;
-  timerDisplay.textContent = formatTime(remaining);
-  timerInterval = setInterval(() => {
-    remaining--;
-    timerDisplay.textContent = formatTime(remaining);
-    if (remaining <= 0) {
-      clearInterval(timerInterval);
-      if (!timeExpiredNotified) {
-        timeExpiredNotified = true;
-        alert("⏰ Время вышло!");
-      }
+    if (!data) {
+      alert("⛔ Твой таймер был удалён администратором.");
+      localStorage.removeItem("userNumber");
+      location.reload();
+      return;
     }
-  }, 1000);
-}
 
+    timerDisplay.textContent = formatTime(data.timeLeft);
+    clearInterval(timerInterval);
+
+    if (!data.isPaused) {
+      // просто визуальное обновление, без записи в базу
+      let remaining = data.timeLeft;
+      timerDisplay.textContent = formatTime(remaining);
+      timerInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = formatTime(remaining);
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          if (!timeExpiredNotified) {
+            timeExpiredNotified = true;
+            alert("⏰ Время вышло!");
+          }
+        }
+      }, 1000);
+    }
+  });
+}
 
       if (data.timeLeft === 0 && !timeExpiredNotified) {
         timeExpiredNotified = true;
