@@ -114,8 +114,21 @@ if (document.getElementById("startBtn")) {
     timerDisplay.textContent = formatTime(data.timeLeft);
     clearInterval(timerInterval);
 
+function listenTimer(num) {
+  db.ref(`timers/${num}`).on("value", snap => {
+    const data = snap.val();
+
+    if (!data) {
+      alert("⛔ Твой таймер был удалён администратором.");
+      localStorage.removeItem("userNumber");
+      location.reload();
+      return;
+    }
+
+    timerDisplay.textContent = formatTime(data.timeLeft);
+    clearInterval(timerInterval);
+
     if (!data.isPaused) {
-      // просто визуальное обновление, без записи в базу
       let remaining = data.timeLeft;
       timerDisplay.textContent = formatTime(remaining);
       timerInterval = setInterval(() => {
@@ -133,11 +146,6 @@ if (document.getElementById("startBtn")) {
   });
 }
 
-      if (data.timeLeft === 0 && !timeExpiredNotified) {
-        timeExpiredNotified = true;
-        alert("⏰ Время вышло!");
-      }
-    });
   }
 
   function showUI(num) {
