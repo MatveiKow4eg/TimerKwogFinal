@@ -46,7 +46,9 @@ if (saved) {
   }
 }
 
-startBtn.onclick = () => {
+startBtn.onclick = (e) => {
+  e.preventDefault(); // Блокируем стандартное поведение
+  
   const num = userInput.value.trim();
   if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
     alert("Введите номер от 1 до 60!");
@@ -66,10 +68,11 @@ startBtn.onclick = () => {
 
     currentNumber = num;
 
-    // 🔄 Новый вариант — безопасный старт с перезагрузкой
     db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true }).then(() => {
       localStorage.setItem("userNumber", num);
-      location.reload(); // вызовет autoStart после загрузки
+      // Вместо перезагрузки - сразу показываем интерфейс
+      showUI(num);
+      listenTimer(num);
     });
   });
 };
