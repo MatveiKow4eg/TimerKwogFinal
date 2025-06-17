@@ -23,6 +23,7 @@ function formatTime(seconds) {
 if (document.getElementById("startBtn")) {
   const userInput = document.getElementById("userNumber");
   const startBtn = document.getElementById("startBtn");
+  startBtn.setAttribute("type", "button"); // ✅ Защита от submit
   const userLabel = document.getElementById("userLabel");
   const userIdDisplay = document.getElementById("userIdDisplay");
   const timerContainer = document.getElementById("timerContainer");
@@ -32,45 +33,58 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-  // Функция для безопасного сохранения номера
   function saveUserNumber(num) {
+    num = parseInt(num, 10).toString(); // ✅ Без ведущих нулей
     try {
       localStorage.setItem("userNumber", num);
-      document.cookie = `userNumber=${num}; path=/; max-age=86400`; // Резерв для iOS
+      document.cookie = `userNumber=${num}; path=/; max-age=86400`;
+      console.log("✅ Сохранён номер:", num);
     } catch (e) {
       console.error("Ошибка сохранения номера:", e);
     }
   }
 
-  // Функция для получения сохранённого номера
   function getSavedNumber() {
     try {
-      return localStorage.getItem("userNumber") || 
-             document.cookie.match(/userNumber=(\d+)/)?.[1];
+      const local = localStorage.getItem("userNumber");
+      const cookie = document.cookie.match(/userNumber=(\d+)/)?.[1];
+      const result = local || cookie;
+      if (result) return parseInt(result, 10).toString(); // ✅ нормализуем
+      return null;
     } catch (e) {
       console.error("Ошибка чтения номера:", e);
       return null;
     }
   }
 
-  // Гарантированный запуск autoStart
-  const saved = getSavedNumber();
-  if (saved) {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
+  // --- Новый способ: URL-параметр как резерв ---
+  const params = new URLSearchParams(window.location.search);
+  const urlNum = params.get("num");
+  if (urlNum && /^\d+$/.test(urlNum)) {
+    console.log("URL содержит номер:", urlNum);
+    saveUserNumber(urlNum);
+    showUI(urlNum);
+    autoStart(urlNum);
+  } else {
+    const saved = getSavedNumber();
+    if (saved) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          showUI(saved);
+          autoStart(saved);
+        });
+      } else {
         showUI(saved);
         autoStart(saved);
-      });
-    } else {
-      showUI(saved);
-      autoStart(saved);
+      }
     }
   }
 
   startBtn.onclick = (e) => {
-    e.preventDefault(); // Блокируем стандартное поведение
-    
-    const num = userInput.value.trim();
+    e.preventDefault();
+
+    const raw = userInput.value.trim();
+    const num = parseInt(raw, 10).toString(); // ✅ преобразуем к числу-строке
     if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
       alert("Введите номер от 1 до 60!");
       return;
@@ -92,8 +106,8 @@ if (document.getElementById("startBtn")) {
       db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true })
         .then(() => {
           saveUserNumber(num);
-          showUI(num);
-          listenTimer(num);
+          // ✅ добавим переход с ?num= в адрес
+          window.location.href = `${window.location.pathname}?num=${num}`;
         })
         .catch(error => {
           console.error("Ошибка Firebase:", error);
@@ -101,6 +115,7 @@ if (document.getElementById("startBtn")) {
         });
     });
   };
+
 
   function autoStart(num) {
     currentNumber = num;
