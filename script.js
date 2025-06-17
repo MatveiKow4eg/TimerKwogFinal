@@ -32,50 +32,75 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-// Гарантированный запуск autoStart даже если DOM уже загружен
-const saved = localStorage.getItem("userNumber");
-if (saved) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
+  // Функция для безопасного сохранения номера
+  function saveUserNumber(num) {
+    try {
+      localStorage.setItem("userNumber", num);
+      document.cookie = `userNumber=${num}; path=/; max-age=86400`; // Резерв для iOS
+    } catch (e) {
+      console.error("Ошибка сохранения номера:", e);
+    }
+  }
+
+  // Функция для получения сохранённого номера
+  function getSavedNumber() {
+    try {
+      return localStorage.getItem("userNumber") || 
+             document.cookie.match(/userNumber=(\d+)/)?.[1];
+    } catch (e) {
+      console.error("Ошибка чтения номера:", e);
+      return null;
+    }
+  }
+
+  // Гарантированный запуск autoStart
+  const saved = getSavedNumber();
+  if (saved) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        showUI(saved);
+        autoStart(saved);
+      });
+    } else {
       showUI(saved);
       autoStart(saved);
-    });
-  } else {
-    showUI(saved);
-    autoStart(saved);
-  }
-}
-
-startBtn.onclick = (e) => {
-  e.preventDefault(); // Блокируем стандартное поведение
-  
-  const num = userInput.value.trim();
-  if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
-    alert("Введите номер от 1 до 60!");
-    return;
-  }
-
-  db.ref("timers").once("value").then(all => {
-    const timers = all.val() || {};
-    if (Object.keys(timers).length >= 60) {
-      alert("Уже 60 участников.");
-      return;
     }
-    if (timers[num]) {
-      alert("Этот номер занят.");
+  }
+
+  startBtn.onclick = (e) => {
+    e.preventDefault(); // Блокируем стандартное поведение
+    
+    const num = userInput.value.trim();
+    if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
+      alert("Введите номер от 1 до 60!");
       return;
     }
 
-    currentNumber = num;
+    db.ref("timers").once("value").then(all => {
+      const timers = all.val() || {};
+      if (Object.keys(timers).length >= 60) {
+        alert("Уже 60 участников.");
+        return;
+      }
+      if (timers[num]) {
+        alert("Этот номер занят.");
+        return;
+      }
 
-    db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true }).then(() => {
-      localStorage.setItem("userNumber", num);
-      // Вместо перезагрузки - сразу показываем интерфейс
-      showUI(num);
-      listenTimer(num);
+      currentNumber = num;
+
+      db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true })
+        .then(() => {
+          saveUserNumber(num);
+          showUI(num);
+          listenTimer(num);
+        })
+        .catch(error => {
+          console.error("Ошибка Firebase:", error);
+          alert("Ошибка при сохранении номера. Попробуйте ещё раз.");
+        });
     });
-  });
-};
+  };
 
   function autoStart(num) {
     currentNumber = num;
@@ -87,11 +112,12 @@ startBtn.onclick = (e) => {
           const found = Object.entries(all).find(([key, val]) => val.renamedTo === num);
           if (found) {
             const [newNum] = found;
-            localStorage.setItem("userNumber", newNum);
+            saveUserNumber(newNum);
             autoStart(newNum);
           } else {
             alert("Номер был удалён.");
             localStorage.removeItem("userNumber");
+            document.cookie = "userNumber=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             location.reload();
           }
         });
@@ -105,13 +131,12 @@ startBtn.onclick = (e) => {
         const data = snap.val();
         if (data?.renamedTo && data.renamedTo !== num) {
           db.ref(`timers/${num}/renamedTo`).remove();
-          localStorage.setItem("userNumber", data.renamedTo);
+          saveUserNumber(data.renamedTo);
           autoStart(data.renamedTo);
         }
       });
     });
   }
-
   function listenTimer(num) {
     db.ref(`timers/${num}`).on("value", snap => {
       const data = snap.val();
