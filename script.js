@@ -32,47 +32,45 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-// Гарантированный запуск autoStart даже если DOM уже загружен
-const saved = localStorage.getItem("userNumber");
-if (saved) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("userNumber");
+  if (saved) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        showUI(saved);
+        autoStart(saved);
+      });
+    } else {
       showUI(saved);
       autoStart(saved);
-    });
-  } else {
-    showUI(saved);
-    autoStart(saved);
-  }
-}
-
-startBtn.onclick = () => {
-  const num = userInput.value.trim();
-  if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
-    alert("Введите номер от 1 до 60!");
-    return;
+    }
   }
 
-  db.ref("timers").once("value").then(all => {
-    const timers = all.val() || {};
-    if (Object.keys(timers).length >= 60) {
-      alert("Уже 60 участников.");
+  startBtn.onclick = () => {
+    const num = userInput.value.trim();
+    if (!/^(0?[1-9]|[1-5][0-9]|60)$/.test(num)) {
+      alert("Введите номер от 1 до 60!");
       return;
     }
-    if (timers[num]) {
-      alert("Этот номер занят.");
-      return;
-    }
+    const numKey = String(+num); // убираем ведущие нули
 
-    currentNumber = num;
+    db.ref("timers").once("value").then(all => {
+      const timers = all.val() || {};
+      if (Object.keys(timers).length >= 60) {
+        alert("Уже 60 участников.");
+        return;
+      }
+      if (timers[numKey]) {
+        alert("Этот номер занят.");
+        return;
+      }
 
-    // 🔄 Новый вариант — безопасный старт с перезагрузкой
-    db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true }).then(() => {
-      localStorage.setItem("userNumber", num);
-      location.reload(); // вызовет autoStart после загрузки
+      currentNumber = numKey;
+      db.ref(`timers/${numKey}`).set({ timeLeft: 600, isPaused: true }).then(() => {
+        localStorage.setItem("userNumber", numKey);
+        location.reload();
+      });
     });
-  });
-};
+  };
 
   function autoStart(num) {
     currentNumber = num;
@@ -112,7 +110,6 @@ startBtn.onclick = () => {
   function listenTimer(num) {
     db.ref(`timers/${num}`).on("value", snap => {
       const data = snap.val();
-
       if (!data) {
         alert("⛔ Твой таймер был удалён администратором.");
         localStorage.removeItem("userNumber");
@@ -125,7 +122,6 @@ startBtn.onclick = () => {
 
       if (!data.isPaused) {
         let remaining = data.timeLeft;
-        timerDisplay.textContent = formatTime(remaining);
         timerInterval = setInterval(() => {
           remaining--;
           timerDisplay.textContent = formatTime(remaining);
@@ -142,9 +138,11 @@ startBtn.onclick = () => {
   }
 
   function showUI(num) {
+    if (!userInput || !startBtn || !userLabel || !userIdDisplay || !timerContainer) return;
     userInput.style.display = "none";
     startBtn.style.display = "none";
-    document.querySelector("h2").style.display = "none";
+    const h2 = document.querySelector("h2");
+    if (h2) h2.style.display = "none";
     userLabel.style.display = "block";
     userIdDisplay.textContent = num;
     timerContainer.style.display = "block";
@@ -156,7 +154,6 @@ if (document.getElementById("usersTable")) {
   const usersTable = document.getElementById("usersTable");
   const pauseAllBtn = document.getElementById("pauseAllBtn");
   let allPaused = false;
-
   const localTimers = {};
 
   db.ref("timers").on("value", snap => {
@@ -210,15 +207,16 @@ if (document.getElementById("usersTable")) {
       btn.onclick = () => {
         const oldUser = btn.dataset.user;
         const newUser = prompt("Новый номер (1–60):", oldUser);
-        if (!/^\d+$/.test(newUser) || +newUser < 1 || +newUser > 60) return alert("Неверный номер!");
-        if (newUser === oldUser) return;
+        if (!/^(0?[1-9]|[1-5][0-9]|60)$/.test(newUser)) return alert("Неверный номер!");
+        const newKey = String(+newUser);
+        if (newKey === oldUser) return;
 
-        db.ref(`timers/${newUser}`).once("value").then(snap => {
+        db.ref(`timers/${newKey}`).once("value").then(snap => {
           if (snap.exists()) return alert("Такой номер уже занят.");
           db.ref(`timers/${oldUser}`).once("value").then(dataSnap => {
             const data = dataSnap.val();
             if (!data) return;
-            db.ref(`timers/${newUser}`).set({ ...data, renamedTo: oldUser });
+            db.ref(`timers/${newKey}`).set({ ...data, renamedTo: oldUser });
             db.ref(`timers/${oldUser}`).remove();
           });
         });
