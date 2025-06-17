@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>КОВЧЕГ — Таймер</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+  
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #000;
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
 
+    .background-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .logo {
+      width: 140px;
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 25px #7df9ff;
+    }
+
+    h1, #inputBlock p, .subtitle, .title {
+      display: none;
+    }
+
+    #inputBlock {
+      margin-top: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    input {
+      padding: 16px 24px;
+      font-size: 22px;
+      border: none;
+      border-radius: 12px;
+      background: #232340;
+      color: #fff;
+      width: 280px;
+      max-width: 90vw;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+    }
+
+    button {
+      padding: 16px 28px;
+      font-size: 20px;
+      border: none;
+      border-radius: 30px;
+      background: #00ffff;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 18px #00ffff;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #7df9ff;
+    }
+
+    #userLabel {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+      text-align: center;
+      width: 100%;
+    }
+
+    #timer {
+      font-size: clamp(40px, 24vw, 220px);
+      line-height: 1;
+      font-weight: bold;
+      background: linear-gradient(to right, #ffffff, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+    }
+
+    #timerContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <img src="background-stars.png" class="background-image" alt="space background" />
+<!-- ВНЕ контейнера -->
+  <object data="kovcheg-logo.svg" type="image/svg+xml" class="logo"></object>
+<div id="timerContainer">
+  <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
+  <div id="timer">10:00</div>
+</div>
+
+  <div class="container">
+    
+
+    <h1>КОВЧЕГ</h1>
+
+    <div id="inputBlock">
+      <input type="text" id="userNumber" placeholder="ВВЕДИТЕ НОМЕР">
+      <button id="startBtn">🚀 НАЧАТЬ ТАЙМЕР</button>
+    </div>
+  </div>
+
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
