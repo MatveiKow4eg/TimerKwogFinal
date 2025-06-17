@@ -1,4 +1,4 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase инициализация
 const firebaseConfig = {
   apiKey: "AIzaSyDxYwWxD_f8e19HwxVqx7McqdE1miW7j5I",
   authDomain: "kwog-24c4c.firebaseapp.com",
@@ -16,14 +16,11 @@ const db = firebase.database();
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60).toString().padStart(2, "0");
   const s = (seconds % 60).toString().padStart(2, "0");
-  return ${m}:${s};
+  return `${m}:${s}`;
 }
-
-// --- Участник ---
 
 function diagnoseEnvironment() {
   const results = [];
-
   try {
     localStorage.setItem("testKey", "1");
     if (localStorage.getItem("testKey") === "1") {
@@ -68,7 +65,7 @@ function diagnoseEnvironment() {
 
   function showResults() {
     alert("🔍 Диагностика среды:\n\n" + results.join("\n"));
-    console.log("🔍 Подробности:\n", results.join("\\n"));
+    console.log("🔍 Подробности:\n", results.join("\n"));
   }
 }
 
@@ -78,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", diagnoseEnvironment);
   }
 });
+
 
 if (document.getElementById("startBtn")) {
   const userInput = document.getElementById("userNumber");
