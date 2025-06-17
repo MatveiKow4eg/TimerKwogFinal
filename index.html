@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
+  
     body {
       margin: 0;
       padding: 0;
@@ -124,6 +125,11 @@
 </head>
 <body>
   <img src="background-stars.png" class="background-image" alt="space background" />
+<!-- ВНЕ контейнера -->
+<div id="timerContainer">
+  <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
+  <div id="timer">10:00</div>
+</div>
 
   <div class="container">
     <object data="kovcheg-logo.svg" type="image/svg+xml" class="logo"></object>
@@ -136,10 +142,7 @@
     </div>
   </div>
 
-  <div id="timerContainer">
-    <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
-    <div id="timer">10:00</div>
-  </div>
+
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
