@@ -24,7 +24,6 @@ function formatTime(seconds) {
 function diagnoseEnvironment() {
   const results = [];
 
-  // 1. Проверка localStorage
   try {
     localStorage.setItem("testKey", "1");
     if (localStorage.getItem("testKey") === "1") {
@@ -37,26 +36,22 @@ function diagnoseEnvironment() {
     results.push("❌ localStorage: заблокирован");
   }
 
-  // 2. Проверка cookies
   results.push(`✅ Cookies: ${navigator.cookieEnabled ? "включены" : "❌ отключены"}`);
 
-  // 3. Проверка встроенного браузера
   const ua = navigator.userAgent.toLowerCase();
   if (ua.includes("instagram") || ua.includes("fb") || ua.includes("tiktok") || ua.includes("line") || ua.includes("telegram")) {
-    results.push("⚠️ Встроенный браузер (Instagram/Telegram/TikTok и т.д.) — возможны ошибки");
+    results.push("⚠️ Встроенный браузер (Instagram/Telegram/TikTok и т.д.)");
   } else {
-    results.push("✅ Браузер: нормальный (не встроенный)");
+    results.push("✅ Браузер: нормальный");
   }
 
-  // 4. Экономия трафика
   const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   if (conn && conn.saveData) {
-    results.push("⚠️ Включен режим экономии трафика (save-data)");
+    results.push("⚠️ Включен режим экономии трафика");
   } else {
     results.push("✅ Экономия трафика: выключена");
   }
 
-  // 5. Инкогнито
   const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
   if (!fs) {
     results.push("❔ Не удалось определить инкогнито");
@@ -77,6 +72,12 @@ function diagnoseEnvironment() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("diagnoseBtn");
+  if (btn) {
+    btn.addEventListener("click", diagnoseEnvironment);
+  }
+});
 
 if (document.getElementById("startBtn")) {
   const userInput = document.getElementById("userNumber");
