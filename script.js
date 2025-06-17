@@ -20,6 +20,64 @@ function formatTime(seconds) {
 }
 
 // --- Участник ---
+
+function diagnoseEnvironment() {
+  const results = [];
+
+  // 1. Проверка localStorage
+  try {
+    localStorage.setItem("testKey", "1");
+    if (localStorage.getItem("testKey") === "1") {
+      results.push("✅ localStorage: работает");
+    } else {
+      results.push("❌ localStorage: недоступен");
+    }
+    localStorage.removeItem("testKey");
+  } catch (e) {
+    results.push("❌ localStorage: заблокирован");
+  }
+
+  // 2. Проверка cookies
+  results.push(`✅ Cookies: ${navigator.cookieEnabled ? "включены" : "❌ отключены"}`);
+
+  // 3. Проверка встроенного браузера
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("instagram") || ua.includes("fb") || ua.includes("tiktok") || ua.includes("line") || ua.includes("telegram")) {
+    results.push("⚠️ Встроенный браузер (Instagram/Telegram/TikTok и т.д.) — возможны ошибки");
+  } else {
+    results.push("✅ Браузер: нормальный (не встроенный)");
+  }
+
+  // 4. Экономия трафика
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (conn && conn.saveData) {
+    results.push("⚠️ Включен режим экономии трафика (save-data)");
+  } else {
+    results.push("✅ Экономия трафика: выключена");
+  }
+
+  // 5. Инкогнито
+  const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+  if (!fs) {
+    results.push("❔ Не удалось определить инкогнито");
+    showResults();
+  } else {
+    fs(window.TEMPORARY, 100, () => {
+      results.push("✅ Инкогнито: нет");
+      showResults();
+    }, () => {
+      results.push("🕵️‍♂️ Режим инкогнито: включен");
+      showResults();
+    });
+  }
+
+  function showResults() {
+    alert("🔍 Диагностика среды:\n\n" + results.join("\n"));
+    console.log("🔍 Подробности:\n", results.join("\\n"));
+  }
+}
+
+
 if (document.getElementById("startBtn")) {
   const userInput = document.getElementById("userNumber");
   const startBtn = document.getElementById("startBtn");
