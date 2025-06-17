@@ -19,36 +19,8 @@ function formatTime(seconds) {
   return `${m}:${s}`;
 }
 
-// --- Участник ---
-if (document.getElementById("startBtn")) {
-  const userInput = document.getElementById("userNumber");
-  const startBtn = document.getElementById("startBtn");
-  const userLabel = document.getElementById("userLabel");
-  const userIdDisplay = document.getElementById("userIdDisplay");
-  const timerContainer = document.getElementById("timerContainer");
-  const timerDisplay = document.getElementById("timer");
-
-  let timerInterval = null;
-  let currentNumber = null;
-  let timeExpiredNotified = false;
-
-  console.log("⏳ Страница загружена, проверяем localStorage...");
-  const saved = localStorage.getItem("userNumber");
-if (saved) {
-  console.log("🔁 Найден сохранённый номер:", saved);
 document.addEventListener("DOMContentLoaded", () => {
-  // Firebase config
-  const firebaseConfig = { ... };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  function formatTime(seconds) {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  }
-
-  // Убедимся, что это не админская страница
+  // --- Участник ---
   if (!document.getElementById("startBtn")) return;
 
   const userInput = document.getElementById("userNumber");
@@ -183,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
     timerContainer.style.display = "block";
   }
 });
-
 // --- Админ ---
 if (document.getElementById("usersTable")) {
   const usersTable = document.getElementById("usersTable");
