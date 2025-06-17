@@ -58,27 +58,30 @@ if (document.getElementById("startBtn")) {
   }
 
   // --- Новый способ: URL-параметр как резерв ---
-  const params = new URLSearchParams(window.location.search);
-  const urlNum = params.get("num");
-  if (urlNum && /^\d+$/.test(urlNum)) {
-    console.log("URL содержит номер:", urlNum);
-    saveUserNumber(urlNum);
-    showUI(urlNum);
-    autoStart(urlNum);
-  } else {
-    const saved = getSavedNumber();
-    if (saved) {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          showUI(saved);
-          autoStart(saved);
-        });
-      } else {
+const params = new URLSearchParams(window.location.search);
+const urlNum = params.get("num");
+if (urlNum && /^\d+$/.test(urlNum)) {
+  console.log("URL содержит номер:", urlNum);
+  saveUserNumber(urlNum);
+  showUI(urlNum);
+  autoStart(urlNum);
+
+  // ✅ Очищаем URL, чтобы избежать бесконечного цикла
+  window.history.replaceState(null, "", window.location.pathname);
+} else {
+  const saved = getSavedNumber();
+  if (saved) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
         showUI(saved);
         autoStart(saved);
-      }
+      });
+    } else {
+      showUI(saved);
+      autoStart(saved);
     }
   }
+}
 
   startBtn.onclick = (e) => {
     e.preventDefault();
