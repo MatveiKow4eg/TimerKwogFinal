@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (h2) h2.style.display = "none";
     userLabel.style.display = "block";
     userIdDisplay.textContent = num;
-    timerContainer.style.display = "block";
+    timerContainer.style.display = "flex";
   }
 });
 // --- Админ ---
