@@ -32,8 +32,10 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
+  console.log("⏳ Страница загружена, проверяем localStorage...");
   const saved = localStorage.getItem("userNumber");
   if (saved) {
+    console.log("🔁 Найден сохранённый номер:", saved);
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", () => {
         showUI(saved);
@@ -47,8 +49,11 @@ if (document.getElementById("startBtn")) {
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
+    console.log("🚀 Нажата кнопка СТАРТ с номером:", num);
+
     if (!/^(0?[1-9]|[1-5][0-9]|60)$/.test(num)) {
       alert("Введите номер от 1 до 60!");
+      console.error("⛔ Неверный ввод номера:", num);
       return;
     }
     const numKey = String(+num); // убираем ведущие нули
@@ -57,16 +62,19 @@ if (document.getElementById("startBtn")) {
       const timers = all.val() || {};
       if (Object.keys(timers).length >= 60) {
         alert("Уже 60 участников.");
+        console.warn("⚠ Превышено количество участников");
         return;
       }
       if (timers[numKey]) {
         alert("Этот номер занят.");
+        console.warn("⚠ Номер уже занят:", numKey);
         return;
       }
 
       currentNumber = numKey;
       db.ref(`timers/${numKey}`).set({ timeLeft: 600, isPaused: true }).then(() => {
         localStorage.setItem("userNumber", numKey);
+        console.log("✅ Зарегистрирован номер:", numKey);
         location.reload();
       });
     });
@@ -121,6 +129,7 @@ if (document.getElementById("startBtn")) {
       clearInterval(timerInterval);
 
       if (!data.isPaused) {
+        console.log("▶ Запущен таймер для номера:", num);
         let remaining = data.timeLeft;
         timerInterval = setInterval(() => {
           remaining--;
@@ -133,11 +142,14 @@ if (document.getElementById("startBtn")) {
             }
           }
         }, 1000);
+      } else {
+        console.log("⏸ Таймер приостановлен для номера:", num);
       }
     });
   }
 
   function showUI(num) {
+    console.log("🎛 Отображаем интерфейс для номера:", num);
     if (!userInput || !startBtn || !userLabel || !userIdDisplay || !timerContainer) return;
     userInput.style.display = "none";
     startBtn.style.display = "none";
@@ -148,6 +160,7 @@ if (document.getElementById("startBtn")) {
     timerContainer.style.display = "block";
   }
 }
+
 
 // --- Админ ---
 if (document.getElementById("usersTable")) {
