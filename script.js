@@ -36,11 +36,39 @@ if (document.getElementById("startBtn")) {
   const saved = localStorage.getItem("userNumber");
 if (saved) {
   console.log("🔁 Найден сохранённый номер:", saved);
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  // Firebase config
+  const firebaseConfig = { ... };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  }
+
+  // Убедимся, что это не админская страница
+  if (!document.getElementById("startBtn")) return;
+
+  const userInput = document.getElementById("userNumber");
+  const startBtn = document.getElementById("startBtn");
+  const userLabel = document.getElementById("userLabel");
+  const userIdDisplay = document.getElementById("userIdDisplay");
+  const timerContainer = document.getElementById("timerContainer");
+  const timerDisplay = document.getElementById("timer");
+
+  let timerInterval = null;
+  let currentNumber = null;
+  let timeExpiredNotified = false;
+
+  console.log("⏳ Страница загружена, проверяем localStorage...");
+  const saved = localStorage.getItem("userNumber");
+  if (saved) {
+    console.log("🔁 Найден сохранённый номер:", saved);
     showUI(saved);
     autoStart(saved);
-  });
-}
+  }
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
@@ -51,7 +79,7 @@ if (saved) {
       console.error("⛔ Неверный ввод номера:", num);
       return;
     }
-    const numKey = String(+num); // убираем ведущие нули
+    const numKey = String(+num);
 
     db.ref("timers").once("value").then(all => {
       const timers = all.val() || {};
@@ -154,8 +182,7 @@ if (saved) {
     userIdDisplay.textContent = num;
     timerContainer.style.display = "block";
   }
-}
-
+});
 
 // --- Админ ---
 if (document.getElementById("usersTable")) {
