@@ -19,7 +19,7 @@ function formatTime(seconds) {
   return `${m}:${s}`;
 }
 
-// --- РЈС‡Р°СЃС‚РЅРёРє ---
+// --- Участник ---
 if (document.getElementById("startBtn")) {
   const userInput = document.getElementById("userNumber");
   const startBtn = document.getElementById("startBtn");
@@ -32,7 +32,7 @@ if (document.getElementById("startBtn")) {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-// Р“Р°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅС‹Р№ Р·Р°РїСѓСЃРє autoStart РґР°Р¶Рµ РµСЃР»Рё DOM СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅ
+// Гарантированный запуск autoStart даже если DOM уже загружен
 const saved = localStorage.getItem("userNumber");
 if (saved) {
   if (document.readyState === "loading") {
@@ -49,27 +49,27 @@ if (saved) {
 startBtn.onclick = () => {
   const num = userInput.value.trim();
   if (!/^\d+$/.test(num) || +num < 1 || +num > 60) {
-    alert("Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ РѕС‚ 1 РґРѕ 60!");
+    alert("Введите номер от 1 до 60!");
     return;
   }
 
   db.ref("timers").once("value").then(all => {
     const timers = all.val() || {};
     if (Object.keys(timers).length >= 60) {
-      alert("РЈР¶Рµ 60 СѓС‡Р°СЃС‚РЅРёРєРѕРІ.");
+      alert("Уже 60 участников.");
       return;
     }
     if (timers[num]) {
-      alert("Р­С‚РѕС‚ РЅРѕРјРµСЂ Р·Р°РЅСЏС‚.");
+      alert("Этот номер занят.");
       return;
     }
 
     currentNumber = num;
 
-    // рџ”„ РќРѕРІС‹Р№ РІР°СЂРёР°РЅС‚ вЂ” Р±РµР·РѕРїР°СЃРЅС‹Р№ СЃС‚Р°СЂС‚ СЃ РїРµСЂРµР·Р°РіСЂСѓР·РєРѕР№
+    // 🔄 Новый вариант — безопасный старт с перезагрузкой
     db.ref(`timers/${num}`).set({ timeLeft: 600, isPaused: true }).then(() => {
       localStorage.setItem("userNumber", num);
-      location.reload(); // РІС‹Р·РѕРІРµС‚ autoStart РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё
+      location.reload(); // вызовет autoStart после загрузки
     });
   });
 };
@@ -87,7 +87,7 @@ startBtn.onclick = () => {
             localStorage.setItem("userNumber", newNum);
             autoStart(newNum);
           } else {
-            alert("РќРѕРјРµСЂ Р±С‹Р» СѓРґР°Р»С‘РЅ.");
+            alert("Номер был удалён.");
             localStorage.removeItem("userNumber");
             location.reload();
           }
@@ -114,7 +114,7 @@ startBtn.onclick = () => {
       const data = snap.val();
 
       if (!data) {
-        alert("в›” РўРІРѕР№ С‚Р°Р№РјРµСЂ Р±С‹Р» СѓРґР°Р»С‘РЅ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂРѕРј.");
+        alert("⛔ Твой таймер был удалён администратором.");
         localStorage.removeItem("userNumber");
         location.reload();
         return;
@@ -133,7 +133,7 @@ startBtn.onclick = () => {
             clearInterval(timerInterval);
             if (!timeExpiredNotified) {
               timeExpiredNotified = true;
-              alert("вЏ° Р’СЂРµРјСЏ РІС‹С€Р»Рѕ!");
+              alert("⏰ Время вышло!");
             }
           }
         }, 1000);
@@ -151,7 +151,7 @@ startBtn.onclick = () => {
   }
 }
 
-// --- РђРґРјРёРЅ ---
+// --- Админ ---
 if (document.getElementById("usersTable")) {
   const usersTable = document.getElementById("usersTable");
   const pauseAllBtn = document.getElementById("pauseAllBtn");
@@ -172,22 +172,22 @@ if (document.getElementById("usersTable")) {
 
       const indicator = `<span class="indicator ${color}"></span>`;
       const isPaused = data[user].isPaused;
-      const pauseText = isPaused ? "в–¶" : "вЏё";
+      const pauseText = isPaused ? "▶" : "⏸";
 
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
         <div class="info">
-          <div>${indicator}<strong>РЈС‡Р°СЃС‚РЅРёРє ${user}</strong></div>
-          <div class="time-display">РћСЃС‚Р°Р»РѕСЃСЊ: ${formatTime(timeLeft)}</div>
+          <div>${indicator}<strong>Участник ${user}</strong></div>
+          <div class="time-display">Осталось: ${formatTime(timeLeft)}</div>
         </div>
         <div class="actions">
-          <button class="delete" data-user="${user}">вќЊ</button>
-          <button class="rename" data-user="${user}">вњЏ</button>
+          <button class="delete" data-user="${user}">❌</button>
+          <button class="rename" data-user="${user}">✏</button>
           <button class="pause" data-user="${user}">${pauseText}</button>
           <button class="add30" data-user="${user}">+30</button>
           <button class="sub30" data-user="${user}">-30</button>
-          <button class="reset" data-user="${user}">рџ”„</button>
+          <button class="reset" data-user="${user}">🔄</button>
         </div>
       `;
       usersTable.appendChild(card);
@@ -209,12 +209,12 @@ if (document.getElementById("usersTable")) {
     document.querySelectorAll(".rename").forEach(btn => {
       btn.onclick = () => {
         const oldUser = btn.dataset.user;
-        const newUser = prompt("РќРѕРІС‹Р№ РЅРѕРјРµСЂ (1вЂ“60):", oldUser);
-        if (!/^\d+$/.test(newUser) || +newUser < 1 || +newUser > 60) return alert("РќРµРІРµСЂРЅС‹Р№ РЅРѕРјРµСЂ!");
+        const newUser = prompt("Новый номер (1–60):", oldUser);
+        if (!/^\d+$/.test(newUser) || +newUser < 1 || +newUser > 60) return alert("Неверный номер!");
         if (newUser === oldUser) return;
 
         db.ref(`timers/${newUser}`).once("value").then(snap => {
-          if (snap.exists()) return alert("РўР°РєРѕР№ РЅРѕРјРµСЂ СѓР¶Рµ Р·Р°РЅСЏС‚.");
+          if (snap.exists()) return alert("Такой номер уже занят.");
           db.ref(`timers/${oldUser}`).once("value").then(dataSnap => {
             const data = dataSnap.val();
             if (!data) return;
@@ -257,7 +257,7 @@ if (document.getElementById("usersTable")) {
     document.querySelectorAll(".reset").forEach(btn => {
       btn.onclick = () => {
         const user = btn.dataset.user;
-        if (confirm("РЎР±СЂРѕСЃРёС‚СЊ С‚Р°Р№РјРµСЂ РґРѕ 10 РјРёРЅСѓС‚?")) {
+        if (confirm("Сбросить таймер до 10 минут?")) {
           db.ref(`timers/${user}`).set({ timeLeft: 600, isPaused: true });
         }
       };
@@ -286,6 +286,6 @@ if (document.getElementById("usersTable")) {
         db.ref(`timers/${user}/isPaused`).set(allPaused);
       }
     });
-    pauseAllBtn.textContent = allPaused ? "в–¶ РЎС‚Р°СЂС‚ РІСЃРµРј" : "вЏё РџР°СѓР·Р° РІСЃРµРј";
+    pauseAllBtn.textContent = allPaused ? "▶ Старт всем" : "⏸ Пауза всем";
   };
 }
