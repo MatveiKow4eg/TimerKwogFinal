@@ -34,18 +34,13 @@ if (document.getElementById("startBtn")) {
 
   console.log("⏳ Страница загружена, проверяем localStorage...");
   const saved = localStorage.getItem("userNumber");
-  if (saved) {
-    console.log("🔁 Найден сохранённый номер:", saved);
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        showUI(saved);
-        autoStart(saved);
-      });
-    } else {
-      showUI(saved);
-      autoStart(saved);
-    }
-  }
+if (saved) {
+  console.log("🔁 Найден сохранённый номер:", saved);
+  document.addEventListener("DOMContentLoaded", () => {
+    showUI(saved);
+    autoStart(saved);
+  });
+}
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
