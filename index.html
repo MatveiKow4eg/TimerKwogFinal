@@ -41,12 +41,12 @@
     }
 
     .logo {
-      width: 100px;
+      width: 140px;
       position: absolute;
-      top: 30px;
+      top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      box-shadow: 0 0 20px #7df9ff;
+      box-shadow: 0 0 25px #7df9ff;
     }
 
     h1, #inputBlock p, .subtitle, .title {
@@ -55,56 +55,33 @@
 
     #inputBlock {
       margin-top: 200px;
-    }
-
-#userLabel {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: #00ffff;
-  text-shadow: 0 0 6px #00ffff;
-}
-
-#timer {
-  font-size: 24vw;
-  line-height: 1;
-  font-weight: bold;
-  background: linear-gradient(to right, #ffffff, #00f0ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
-  text-align: center;     /* ✅ выравнивание по центру */
-  margin: 0;              /* ✅ убираем отступы */
-  padding: 0;             /* ✅ на всякий случай */
-  display: inline-block;  /* ✅ для точного центрирования текста */
-}
-
-
-    @media (min-width: 768px) {
-      #timer {
-        font-size: 160px;
-      }
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
     input {
-      padding: 12px 18px;
-      font-size: 18px;
+      padding: 16px 24px;
+      font-size: 22px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       background: #232340;
       color: #fff;
-      margin-bottom: 12px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      width: 280px;
+      max-width: 90vw;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
     }
 
     button {
-      padding: 12px 24px;
-      font-size: 18px;
+      padding: 16px 28px;
+      font-size: 20px;
       border: none;
-      border-radius: 25px;
+      border-radius: 30px;
       background: #00ffff;
       color: #000;
       cursor: pointer;
-      box-shadow: 0 0 15px #00ffff;
+      box-shadow: 0 0 18px #00ffff;
       transition: 0.3s;
     }
 
@@ -112,15 +89,41 @@
       background: #7df9ff;
     }
 
-#timerContainer {
-  display: none; /* <-- потом становится flex */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* ✅ важно! центрирует по высоте */
-  text-align: center;
-}
+    #userLabel {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+    }
 
+    #timer {
+      font-size: 24vw;
+      line-height: 1;
+      font-weight: bold;
+      background: linear-gradient(to right, #ffffff, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+    }
+
+    @media (min-width: 768px) {
+      #timer {
+        font-size: 160px;
+      }
+    }
+
+    #timerContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -132,22 +135,20 @@
     <h1>КОВЧЕГ</h1>
 
     <div id="inputBlock">
-      <p>Введи свой </p>
       <input type="text" id="userNumber" placeholder="например: 17" />
       <button id="startBtn">🚀 НАЧАТЬ ТАЙМЕР</button>
     </div>
+  </div>
 
-    <div id="timerContainer">
-      <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span>
-      <div id="timer">10:00</div>
-    </div>
+  <!-- Вынесено отдельно, чтобы центрировалось отдельно -->
+  <div id="timerContainer">
+    <h2 id="userLabel">НОМЕР — <span id="userIdDisplay"></span></h2>
+    <div id="timer">10:00</div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-
-<!-- ✅ Консоль отладки -->
+  <!-- ✅ Консоль отладки -->
 <!--<script>
 (function () {
   const logBox = document.createElement("div");
@@ -188,7 +189,6 @@
 </script>
 
 <!-- 👇 Подключение твоего скрипта -->
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
-
 </html>
