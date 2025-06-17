@@ -64,15 +64,20 @@
   text-shadow: 0 0 6px #00ffff;
 }
 
-    #timer {
-      font-size: 24vw;
-      line-height: 1;
-      font-weight: bold;
-      background: linear-gradient(to right, #ffffff, #00f0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
-    }
+#timer {
+  font-size: 24vw;
+  line-height: 1;
+  font-weight: bold;
+  background: linear-gradient(to right, #ffffff, #00f0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 35px rgba(129, 255, 255, 0.6);
+  text-align: center;     /* ✅ выравнивание по центру */
+  margin: 0;              /* ✅ убираем отступы */
+  padding: 0;             /* ✅ на всякий случай */
+  display: inline-block;  /* ✅ для точного центрирования текста */
+}
+
 
     @media (min-width: 768px) {
       #timer {
@@ -107,8 +112,15 @@
       background: #7df9ff;
     }
 
-    #timerContainer {
-      display: none;
+#timerContainer {
+  display: none; /* <-- потом становится flex */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* ✅ важно! центрирует по высоте */
+  text-align: center;
+}
+
   </style>
 </head>
 <body>
