@@ -140,26 +140,28 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+  <!-- ✅ Консоль отладки -->
   <script>
+  (function () {
+    const logBox = document.createElement("div");
     logBox.style.cssText = "position:fixed;bottom:0;left:0;width:100%;max-height:150px;overflow:auto;background:#111;color:#0ff;font:12px monospace;padding:5px;z-index:99999;border-top:2px solid red;";
-(function () {
-  const logBox = document.createElement("div");
-  logBox.style.cssText = "position:fixed;bottom:0;left:0;width:100%;max-height:150px;overflow:auto;background:#111;color:#0ff;font:12px monospace;padding:5px;z-index:9999;border-top:1px solid #0ff;";
-  document.body.appendChild(logBox);
+    document.body.appendChild(logBox);
 
-  const originalLog = console.log;
-  console.log = function (...args) {
-    logBox.innerHTML += args.map(a => {
-      try { return JSON.stringify(a); } catch (e) { return a; }
-    }).join(" ") + "<br>";
-    originalLog.apply(console, args);
-  };
+    const originalLog = console.log;
+    console.log = function (...args) {
+      logBox.innerHTML += args.map(a => {
+        try { return JSON.stringify(a); } catch (e) { return a; }
+      }).join(" ") + "<br>";
+      originalLog.apply(console, args);
+    };
 
-  window.onerror = function (msg, src, lineno, colno, err) {
-    logBox.innerHTML += `<span style='color:red;'>Ошибка: ${msg} (${src}:${lineno})</span><br>`;
-  };
-})();
-</script>
-<script src="script.js"></script>
+    window.onerror = function (msg, src, lineno, colno, err) {
+      logBox.innerHTML += `<span style='color:red;'>Ошибка: ${msg} (${src}:${lineno})</span><br>`;
+    };
+  })();
+  </script>
+
+  <script src="script.js"></script>
 </body>
+
 </html>
