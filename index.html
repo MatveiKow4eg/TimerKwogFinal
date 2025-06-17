@@ -140,6 +140,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+
 <!-- ✅ Консоль отладки -->
 <script>
 (function () {
@@ -155,25 +156,29 @@
     originalLog.apply(console, args);
   };
 
+  const originalError = console.error;
+  console.error = function (...args) {
+    logBox.innerHTML += `<span style="color:red;">` + args.map(a => {
+      try { return JSON.stringify(a); } catch (e) { return a; }
+    }).join(" ") + `</span><br>`;
+    originalError.apply(console, args);
+  };
+
   window.onerror = function (msg, src, lineno, colno, err) {
     logBox.innerHTML += `<span style='color:red;'>Ошибка: ${msg} (${src}:${lineno})</span><br>`;
   };
-})();
-</script>
 
-<!-- ✅ Тесты -->
-<script>
+  // ✅ Тесты
   console.log("🛰️ Ковчег: отладка активна");
-
   let a = 5;
   console.log("Число A:", a);
 
-  // Временно, чтобы протестировать отлавливание ошибок
   try {
     nonExistentFunction();
   } catch (e) {
     console.error("Поймана ошибка:", e.message);
   }
+})();
 </script>
 
 <!-- 👇 Подключение твоего скрипта -->
