@@ -34,42 +34,34 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentNumber = null;
   let timeExpiredNotified = false;
 
-  console.log("⏳ Страница загружена, проверяем localStorage...");
   const saved = localStorage.getItem("userNumber");
   if (saved) {
-    console.log("🔁 Найден сохранённый номер:", saved);
     showUI(saved);
     autoStart(saved);
   }
 
   startBtn.onclick = () => {
     const num = userInput.value.trim();
-    console.log("🚀 Нажата кнопка СТАРТ с номером:", num);
-
-    if (!/^(0?[1-9]|[1-5][0-9]|60)$/.test(num)) {
-      alert("Введите номер от 1 до 60!");
-      console.error("⛔ Неверный ввод номера:", num);
+    if (!/^(0?[1-9]|[1-9][0-9]|100)$/.test(num)) {
+      alert("Введите номер от 1 до 100!");
       return;
     }
-    const numKey = String(+num);
 
+    const numKey = String(+num);
     db.ref("timers").once("value").then(all => {
       const timers = all.val() || {};
-      if (Object.keys(timers).length >= 60) {
-        alert("Уже 60 участников.");
-        console.warn("⚠ Превышено количество участников");
+      if (Object.keys(timers).length >= 100) {
+        alert("Уже 100 участников.");
         return;
       }
       if (timers[numKey]) {
         alert("Этот номер занят.");
-        console.warn("⚠ Номер уже занят:", numKey);
         return;
       }
 
       currentNumber = numKey;
       db.ref(`timers/${numKey}`).set({ timeLeft: 600, isPaused: true }).then(() => {
         localStorage.setItem("userNumber", numKey);
-        console.log("✅ Зарегистрирован номер:", numKey);
         location.reload();
       });
     });
@@ -124,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
       clearInterval(timerInterval);
 
       if (!data.isPaused) {
-        console.log("▶ Запущен таймер для номера:", num);
         let remaining = data.timeLeft;
         timerInterval = setInterval(() => {
           remaining--;
@@ -137,15 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
         }, 1000);
-      } else {
-        console.log("⏸ Таймер приостановлен для номера:", num);
       }
     });
   }
 
   function showUI(num) {
-    console.log("🎛 Отображаем интерфейс для номера:", num);
-    if (!userInput || !startBtn || !userLabel || !userIdDisplay || !timerContainer) return;
     userInput.style.display = "none";
     startBtn.style.display = "none";
     const h2 = document.querySelector("h2");
@@ -155,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     timerContainer.style.display = "flex";
   }
 });
+
 // --- Админ ---
 if (document.getElementById("usersTable")) {
   const usersTable = document.getElementById("usersTable");
@@ -212,8 +200,8 @@ if (document.getElementById("usersTable")) {
     document.querySelectorAll(".rename").forEach(btn => {
       btn.onclick = () => {
         const oldUser = btn.dataset.user;
-        const newUser = prompt("Новый номер (1–60):", oldUser);
-        if (!/^(0?[1-9]|[1-5][0-9]|60)$/.test(newUser)) return alert("Неверный номер!");
+        const newUser = prompt("Новый номер (1–100):", oldUser);
+        if (!/^(0?[1-9]|[1-9][0-9]|100)$/.test(newUser)) return alert("Неверный номер!");
         const newKey = String(+newUser);
         if (newKey === oldUser) return;
 
